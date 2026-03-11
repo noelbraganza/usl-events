@@ -7,7 +7,25 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        usl: {
+          purple: '#905AC0',
+          pink: '#D03B6E',
+          sky: '#6DDEF7',
+          gold: '#E8B840',
+        },
+      },
+      animation: {
+        'gradient-spin': 'gradient-spin 6s linear infinite',
+      },
+      keyframes: {
+        'gradient-spin': {
+          '0%': { '--angle': '0deg' },
+          '100%': { '--angle': '360deg' },
+        },
+      },
+    },
   },
   plugins: [],
 }

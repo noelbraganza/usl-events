@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 import { MapPin, Calendar, Clock, Users } from 'lucide-react'
 import type { Speaker } from '@/lib/types'
 import RSVPForm from './RSVPForm'
+import EventPageClient from './EventPageClient'
 
 interface Props {
   params: { slug: string }
@@ -39,6 +40,7 @@ export default async function EventPage({ params, searchParams }: Props) {
 
   return (
     <main className="min-h-screen bg-white">
+      {/* RSVP status banners */}
       {searchParams.rsvp === 'confirmed' && (
         <div className="bg-green-50 border-b border-green-200 px-6 py-4 text-center">
           <p className="text-green-800 font-medium">
@@ -54,10 +56,12 @@ export default async function EventPage({ params, searchParams }: Props) {
         </div>
       )}
 
-      {/* Header */}
-      <header className="border-b border-zinc-100 px-6 py-4">
+      {/* Header with brand accent line */}
+      <header className="border-b border-zinc-100 px-6 py-4 relative">
+        <div className="absolute bottom-0 left-0 right-0 h-[2px]"
+          style={{ background: 'linear-gradient(to right, #905AC0, #D03B6E, #6DDEF7)' }} />
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <span className="text-sm font-medium text-zinc-500">Up Strategy Lab</span>
+          <span className="text-sm font-semibold text-zinc-700">Up Strategy Lab</span>
           <a
             href="https://upstrategylab.com"
             target="_blank"
@@ -69,12 +73,58 @@ export default async function EventPage({ params, searchParams }: Props) {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-16">
+      {/* Hero section */}
+      <section
+        className="relative overflow-hidden"
+        style={{ background: '#0f0f13', minHeight: '420px' }}
+      >
+        {/* Dot grid */}
+        <div
+          className="absolute inset-0 opacity-[0.15]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+
+        {/* Ambient colour glows */}
+        <div
+          className="absolute top-[-80px] left-[-80px] w-[420px] h-[420px] opacity-30 pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, #905AC0 0%, transparent 70%)',
+          }}
+        />
+        <div
+          className="absolute bottom-[-60px] right-[-60px] w-[360px] h-[360px] opacity-25 pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, #D03B6E 0%, transparent 70%)',
+          }}
+        />
+        <div
+          className="absolute top-[30%] right-[25%] w-[260px] h-[260px] opacity-20 pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, #6DDEF7 0%, transparent 70%)',
+          }}
+        />
+
+        {/* Cover image / placeholder — centred in hero */}
+        <div className="relative z-10 flex flex-col items-center justify-center py-16 px-6">
+          <EventPageClient
+            coverImage={event.cover_image ?? null}
+            title={event.title}
+          />
+        </div>
+      </section>
+
+      {/* Content */}
+      <div className="max-w-5xl mx-auto px-6 py-14">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-14">
           {/* Left: event info */}
           <div>
+            {/* Title block */}
             <div className="mb-8">
-              <span className="inline-block text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">
+              <span className="inline-block text-xs font-semibold uppercase tracking-widest mb-3"
+                style={{ color: '#905AC0' }}>
                 {event.status === 'upcoming' ? 'Upcoming Event' : event.status}
               </span>
               <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 leading-tight mb-4">
@@ -85,26 +135,36 @@ export default async function EventPage({ params, searchParams }: Props) {
               )}
             </div>
 
-            {/* Event details */}
-            <div className="flex flex-col gap-3 mb-10 pl-1">
+            {/* Detail badges */}
+            <div className="flex flex-col gap-3 mb-10">
               <div className="flex items-center gap-3 text-zinc-700">
-                <Calendar className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+                <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(144,90,192,0.1)' }}>
+                  <Calendar className="w-4 h-4" style={{ color: '#905AC0' }} />
+                </span>
                 <span>{format(new Date(event.start_date), 'EEEE, d MMMM yyyy')}</span>
               </div>
               <div className="flex items-center gap-3 text-zinc-700">
-                <Clock className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+                <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(109,222,247,0.1)' }}>
+                  <Clock className="w-4 h-4" style={{ color: '#6DDEF7' }} />
+                </span>
                 <span>
                   {format(new Date(event.start_date), 'HH:mm')} – {format(new Date(event.end_date), 'HH:mm')}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-zinc-700">
-                <MapPin className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+                <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(208,59,110,0.1)' }}>
+                  <MapPin className="w-4 h-4" style={{ color: '#D03B6E' }} />
+                </span>
                 {event.location_url ? (
                   <a
                     href={event.location_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:underline"
+                    style={{ color: '#D03B6E' }}
                   >
                     {event.location}
                   </a>
@@ -113,9 +173,18 @@ export default async function EventPage({ params, searchParams }: Props) {
                 )}
               </div>
               {event.capacity && (
-                <div className="flex items-center gap-3 text-zinc-700">
-                  <Users className="w-5 h-5 text-zinc-400 flex-shrink-0" />
-                  <span>
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(232,184,64,0.1)' }}>
+                    <Users className="w-4 h-4" style={{ color: '#E8B840' }} />
+                  </span>
+                  <span
+                    className="text-sm font-semibold px-3 py-1 rounded-full"
+                    style={{
+                      background: isFull ? 'rgba(208,59,110,0.1)' : 'rgba(232,184,64,0.12)',
+                      color: isFull ? '#D03B6E' : '#c49a20',
+                    }}
+                  >
                     {isFull
                       ? 'Full — join the waitlist below'
                       : `${spotsLeft} spot${spotsLeft === 1 ? '' : 's'} left`}
@@ -147,7 +216,8 @@ export default async function EventPage({ params, searchParams }: Props) {
                 <div className="space-y-8">
                   {speakers.map((speaker: Speaker) => (
                     <div key={speaker.id} className="flex gap-5">
-                      <div className="w-14 h-14 rounded-full bg-zinc-100 flex-shrink-0 overflow-hidden">
+                      <div className="w-14 h-14 rounded-full flex-shrink-0 overflow-hidden"
+                        style={{ background: 'linear-gradient(135deg, #905AC0, #D03B6E)' }}>
                         {speaker.avatar_url ? (
                           <img
                             src={speaker.avatar_url}
@@ -155,7 +225,7 @@ export default async function EventPage({ params, searchParams }: Props) {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xl font-semibold text-zinc-400">
+                          <div className="w-full h-full flex items-center justify-center text-xl font-semibold text-white">
                             {speaker.name.charAt(0)}
                           </div>
                         )}
@@ -163,7 +233,7 @@ export default async function EventPage({ params, searchParams }: Props) {
                       <div className="flex-1">
                         <p className="font-semibold text-zinc-900">{speaker.name}</p>
                         {speaker.title && (
-                          <p className="text-sm text-zinc-500 mb-3">{speaker.title}</p>
+                          <p className="text-sm mb-3" style={{ color: '#905AC0' }}>{speaker.title}</p>
                         )}
                         {speaker.bio && (
                           <div className="space-y-2">
@@ -182,7 +252,7 @@ export default async function EventPage({ params, searchParams }: Props) {
             )}
           </div>
 
-          {/* Right: RSVP form */}
+          {/* Right: RSVP form (sticky) */}
           <div className="lg:sticky lg:top-8 lg:self-start">
             <RSVPForm
               eventId={event.id}

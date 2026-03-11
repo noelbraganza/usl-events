@@ -42,6 +42,7 @@ export default function EventForm({ event }: Props) {
   const [location, setLocation] = useState(event?.location ?? '')
   const [locationUrl, setLocationUrl] = useState(event?.location_url ?? '')
   const [capacity, setCapacity] = useState(event?.capacity ? String(event.capacity) : '')
+  const [coverImage, setCoverImage] = useState(event?.cover_image ?? '')
   const [status, setStatus] = useState<Event['status']>(event?.status ?? 'upcoming')
   const [published, setPublished] = useState(event?.published ?? false)
   const [saving, setSaving] = useState(false)
@@ -66,6 +67,7 @@ export default function EventForm({ event }: Props) {
       end_date: new Date(endDate).toISOString(),
       location,
       location_url: locationUrl || null,
+      cover_image: coverImage || null,
       capacity: capacity ? parseInt(capacity) : null,
       status,
       published,
@@ -149,6 +151,21 @@ export default function EventForm({ event }: Props) {
           placeholder="A short description shown in listings"
           className={inputClass}
         />
+      </div>
+
+      {/* Cover image */}
+      <div>
+        <label className={labelClass}>Cover image URL <span className="text-zinc-400 font-normal">(optional)</span></label>
+        <input
+          type="url"
+          value={coverImage}
+          onChange={(e) => setCoverImage(e.target.value)}
+          placeholder="https://example.com/image.jpg"
+          className={inputClass}
+        />
+        <p className="text-xs text-zinc-400 mt-1.5">
+          Paste a direct image URL. Recommended: square, at least 800×800px.
+        </p>
       </div>
 
       {/* Description */}
