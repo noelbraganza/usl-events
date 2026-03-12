@@ -3,21 +3,19 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
-const CDN = 'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/'
-
 const animals = [
-  '5fdbcc637c048b16002b8a57_Sharky.avif',
-  '5fdbcc650d32d44b9d92a4c7_Owlie.avif',
-  '5fdbcc67054e8e3ba1e8007f_Kittykat.avif',
-  '5fdbcc6a7ac0d8d48593313e_BunnyHoney.avif',
-  '5fdbcc6ca026ba567f345368_FrogDestroyer.avif',
-  '6231ac0372a11ceb1506b829_Duckorn.avif',
+  'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/6231ac0372a11ceb1506b829_Duckorn.avif',
+  'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/5fe0cd2980460ca0bd0d3202_Sharky_USL.avif',
+  'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/5fdbcc6ca026ba567f345368_FrogDestroyer.avif',
+  'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/5fdbcc650d32d44b9d92a4c7_Owlie.avif',
+  'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/5fdbcc67054e8e3ba1e8007f_Kittykat.avif',
+  'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/5fdbcc6a7ac0d8d48593313e_BunnyHoney.avif',
 ]
 
-const USL_WORDMARK = `${CDN}5fdbc077c5dde892e98cc900_USL.svg`
+const USL_WORDMARK = 'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/5fdbc077c5dde892e98cc900_USL.svg'
 
 export default function BrandAnimals() {
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent] = useState(() => Math.floor(Math.random() * animals.length))
   const [visible, setVisible] = useState(true)
 
   useEffect(() => {
@@ -35,7 +33,7 @@ export default function BrandAnimals() {
     <div className="flex items-center gap-2">
       <div className="relative w-[50px] h-[50px]">
         <Image
-          src={`${CDN}${animals[current]}`}
+          src={animals[current]}
           alt="USL mascot"
           width={50}
           height={50}
@@ -48,6 +46,7 @@ export default function BrandAnimals() {
         alt="USL"
         width={48}
         height={20}
+        style={{ minWidth: '120px' }}
         unoptimized
       />
     </div>

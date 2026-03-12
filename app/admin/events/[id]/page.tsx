@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import EventForm from '../EventForm'
 import RSVPList from './RSVPList'
+import SpeakerManager from '@/app/components/admin/SpeakerManager'
 
 interface Props {
   params: { id: string }
@@ -11,13 +12,18 @@ interface Props {
 export default async function EditEventPage({ params }: Props) {
   const supabase = createClient()
 
-  const [{ data: event }, { data: rsvps }] = await Promise.all([
+  const [{ data: event }, { data: rsvps }, { data: speakers }] = await Promise.all([
     supabase.from('events').select('*').eq('id', params.id).single(),
     supabase
       .from('rsvps')
       .select('*')
       .eq('event_id', params.id)
       .order('created_at', { ascending: false }),
+    supabase
+      .from('event_speakers')
+      .select('*')
+      .eq('event_id', params.id)
+      .order('display_order'),
   ])
 
   if (!event) notFound()
@@ -45,6 +51,10 @@ export default async function EditEventPage({ params }: Props) {
       </div>
 
       <EventForm event={event} />
+
+      <div className="mt-16 pt-10 border-t border-zinc-200">
+        <SpeakerManager eventId={event.id} initialSpeakers={speakers ?? []} />
+      </div>
 
       <div className="mt-16 pt-10 border-t border-zinc-200">
         <RSVPList rsvps={rsvps ?? []} eventTitle={event.title} eventId={event.id} />
