@@ -8,6 +8,7 @@ export type Event = {
   end_date: string
   location: string
   location_url: string | null
+  remote_url: string | null
   capacity: number | null
   published: boolean
   status: 'upcoming' | 'live' | 'past' | 'cancelled'

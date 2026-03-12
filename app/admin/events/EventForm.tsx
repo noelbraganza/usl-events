@@ -78,6 +78,7 @@ export default function EventForm({ event }: Props) {
   )
   const [location, setLocation] = useState(event?.location ?? '')
   const [locationUrl, setLocationUrl] = useState(event?.location_url ?? '')
+  const [remoteUrl, setRemoteUrl] = useState(event?.remote_url ?? '')
   const [capacity, setCapacity] = useState(event?.capacity ? String(event.capacity) : '')
   const [coverImage, setCoverImage] = useState(event?.cover_image ?? '')
   const [status, setStatus] = useState<Event['status']>(event?.status ?? 'upcoming')
@@ -111,6 +112,7 @@ export default function EventForm({ event }: Props) {
       timezone,
       location,
       location_url: locationUrl || null,
+      remote_url: remoteUrl || null,
       cover_image: coverImage || null,
       capacity: capacity ? parseInt(capacity) : null,
       status,
@@ -288,6 +290,21 @@ export default function EventForm({ event }: Props) {
           placeholder="https://maps.google.com/?q=..."
           className={inputClass}
         />
+      </div>
+
+      {/* Remote link */}
+      <div>
+        <label className={labelClass}>Remote link <span className="text-zinc-400 font-normal">(optional)</span></label>
+        <input
+          type="url"
+          value={remoteUrl}
+          onChange={(e) => setRemoteUrl(e.target.value)}
+          placeholder="https://meet.google.com/... or https://youtube.com/live/..."
+          className={inputClass}
+        />
+        <p className="text-xs text-zinc-400 mt-1.5">
+          Google Meet, YouTube Live, or similar. Shown publicly only when event status is set to Live.
+        </p>
       </div>
 
       {/* Capacity */}

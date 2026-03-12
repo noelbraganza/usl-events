@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { MapPin, Calendar, Clock, Users } from 'lucide-react'
+import { MapPin, Calendar, Clock, Users, Wifi } from 'lucide-react'
 import type { Speaker } from '@/lib/types'
 import RSVPForm from './RSVPForm'
 import EventPageClient from './EventPageClient'
@@ -201,6 +201,31 @@ export default async function EventPage({ params, searchParams }: Props) {
                       ? 'Full — join the waitlist below'
                       : `${spotsLeft} spot${spotsLeft === 1 ? '' : 's'} left`}
                   </span>
+                </div>
+              )}
+              {event.remote_url && event.status !== 'live' && (
+                <div className="flex items-center gap-3 text-zinc-700">
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(109,222,247,0.1)' }}>
+                    <Wifi className="w-4 h-4" style={{ color: '#6DDEF7' }} />
+                  </span>
+                  <span className="text-sm text-zinc-500">
+                    Also available remotely — join link goes live at event start
+                  </span>
+                </div>
+              )}
+              {event.remote_url && event.status === 'live' && (
+                <div className="flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(109,222,247,0.15)' }}>
+                    <Wifi className="w-4 h-4" style={{ color: '#6DDEF7' }} />
+                  </span>
+                  <a href={event.remote_url} target="_blank" rel="noopener noreferrer"
+                     className="text-sm font-semibold flex items-center gap-2"
+                     style={{ color: '#6DDEF7' }}>
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
+                    Join live →
+                  </a>
                 </div>
               )}
             </div>

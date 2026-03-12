@@ -1,6 +1,14 @@
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 
+function animalIndex(id: string): number {
+  let h = 0
+  for (let i = 0; i < id.length; i++) {
+    h = (h * 31 + id.charCodeAt(i)) >>> 0
+  }
+  return h % animals.length
+}
+
 const animals = [
   'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/6231ac0372a11ceb1506b829_Duckorn.avif',
   'https://cdn.prod.website-files.com/5bd5a72a5a6dba8eece24cfd/5fe0cd2980460ca0bd0d3202_Sharky_USL.avif',
@@ -36,9 +44,9 @@ export default async function AttendeesList({ eventId }: Props) {
         People going ({rsvps.length})
       </h2>
       <div className="flex flex-wrap gap-4">
-        {shown.map((rsvp, index) => {
+        {shown.map((rsvp) => {
           const firstName = (rsvp.name ?? 'Guest').split(' ')[0]
-          const animal = animals[index % animals.length]
+          const animal = animals[animalIndex(rsvp.id)]
 
           return (
             <div key={rsvp.id} className="flex flex-col items-center gap-1.5">
