@@ -57,7 +57,7 @@ export async function sendInviteEmail({ userId, eventId, origin }: SendInviteOpt
       endDate.getMinutes(),
     ],
     url: `${baseUrl}/events/${event.slug}`,
-    organizer: { name: 'Up Strategy Lab', email: 'events@upstrategylab.com' },
+    organizer: { name: 'Up Strategy Lab', email: 'events@events.upstrategylab.com' },
   })
 
   const gcalUrl =
@@ -69,7 +69,7 @@ export async function sendInviteEmail({ userId, eventId, origin }: SendInviteOpt
 
   try {
     await resend.emails.send({
-      from: 'events@upstrategylab.com',
+      from: 'events@events.upstrategylab.com',
       to: rsvp.email,
       subject: `You're on the list — ${event.title}`,
       html: buildEmailHtml({ event, rsvp, gcalUrl, baseUrl }),
