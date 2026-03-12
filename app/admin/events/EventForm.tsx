@@ -18,11 +18,47 @@ function slugify(text: string) {
     .replace(/-+/g, '-')
 }
 
-function toLocalDatetimeValue(iso: string) {
+// UTC ISO → wall clock string for datetime-local input
+function isoToWallClock(iso: string, tz: string): string {
   const d = new Date(iso)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: tz,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(d)
+  const p = Object.fromEntries(parts.map((x) => [x.type, x.value]))
+  const hour = p.hour === '24' ? '00' : p.hour
+  return `${p.year}-${p.month}-${p.day}T${hour}:${p.minute}`
 }
+
+// Wall clock string in tz → UTC ISO (for saving)
+function wallClockToISO(local: string, tz: string): string {
+  const asUTC = new Date(local + ':00.000Z')
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: tz,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+  }).formatToParts(asUTC)
+  const p = Object.fromEntries(parts.map((x) => [x.type, x.value]))
+  const hour = p.hour === '24' ? '00' : p.hour
+  const displayedMs = new Date(`${p.year}-${p.month}-${p.day}T${hour}:${p.minute}:00.000Z`).getTime()
+  const diff = asUTC.getTime() - displayedMs
+  return new Date(asUTC.getTime() + diff).toISOString()
+}
+
+const TIMEZONES = [
+  'Europe/Stockholm',
+  'Europe/London',
+  'Europe/Paris',
+  'Europe/Berlin',
+  'UTC',
+  'America/New_York',
+  'America/Chicago',
+  'America/Los_Angeles',
+  'Asia/Dubai',
+  'Asia/Singapore',
+  'Australia/Sydney',
+]
 
 export default function EventForm({ event }: Props) {
   const router = useRouter()
@@ -33,11 +69,12 @@ export default function EventForm({ event }: Props) {
   const [slug, setSlug] = useState(event?.slug ?? '')
   const [tagline, setTagline] = useState(event?.tagline ?? '')
   const [description, setDescription] = useState(event?.description ?? '')
+  const [timezone, setTimezone] = useState(event?.timezone ?? 'Europe/Stockholm')
   const [startDate, setStartDate] = useState(
-    event ? toLocalDatetimeValue(event.start_date) : ''
+    event ? isoToWallClock(event.start_date, event.timezone ?? 'Europe/Stockholm') : ''
   )
   const [endDate, setEndDate] = useState(
-    event ? toLocalDatetimeValue(event.end_date) : ''
+    event ? isoToWallClock(event.end_date, event.timezone ?? 'Europe/Stockholm') : ''
   )
   const [location, setLocation] = useState(event?.location ?? '')
   const [locationUrl, setLocationUrl] = useState(event?.location_url ?? '')
@@ -53,6 +90,12 @@ export default function EventForm({ event }: Props) {
     if (!isEdit) setSlug(slugify(val))
   }
 
+  function handleTimezoneChange(newTz: string) {
+    if (startDate) setStartDate(isoToWallClock(wallClockToISO(startDate, timezone), newTz))
+    if (endDate) setEndDate(isoToWallClock(wallClockToISO(endDate, timezone), newTz))
+    setTimezone(newTz)
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
@@ -63,8 +106,9 @@ export default function EventForm({ event }: Props) {
       slug,
       tagline: tagline || null,
       description: description || null,
-      start_date: new Date(startDate).toISOString(),
-      end_date: new Date(endDate).toISOString(),
+      start_date: wallClockToISO(startDate, timezone),
+      end_date: wallClockToISO(endDate, timezone),
+      timezone,
       location,
       location_url: locationUrl || null,
       cover_image: coverImage || null,
@@ -202,6 +246,23 @@ export default function EventForm({ event }: Props) {
             className={inputClass}
           />
         </div>
+      </div>
+
+      {/* Timezone */}
+      <div>
+        <label className={labelClass}>Timezone</label>
+        <select
+          value={timezone}
+          onChange={(e) => handleTimezoneChange(e.target.value)}
+          className={inputClass}
+        >
+          {TIMEZONES.map((tz) => (
+            <option key={tz} value={tz}>{tz}</option>
+          ))}
+        </select>
+        <p className="text-xs text-zinc-400 mt-1.5">
+          All times are stored and displayed in this timezone.
+        </p>
       </div>
 
       {/* Location */}

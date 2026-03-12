@@ -1,12 +1,29 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { format } from 'date-fns'
 import { MapPin, Calendar, Clock, Users } from 'lucide-react'
 import type { Speaker } from '@/lib/types'
 import RSVPForm from './RSVPForm'
 import EventPageClient from './EventPageClient'
 import AttendeesList from './AttendeesList'
 import BrandAnimals from '@/app/components/admin/BrandAnimals'
+
+function formatEventDate(iso: string, tz: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  }).format(new Date(iso))
+}
+
+function formatEventTime(iso: string, tz: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(new Date(iso))
+}
+
+function getTimezoneAbbr(iso: string, tz: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, timeZoneName: 'short',
+  }).formatToParts(new Date(iso)).find((p) => p.type === 'timeZoneName')?.value ?? tz
+}
 
 interface Props {
   params: { slug: string }
@@ -137,7 +154,7 @@ export default async function EventPage({ params, searchParams }: Props) {
                   style={{ background: 'rgba(144,90,192,0.1)' }}>
                   <Calendar className="w-4 h-4" style={{ color: '#905AC0' }} />
                 </span>
-                <span>{format(new Date(event.start_date), 'EEEE, d MMMM yyyy')}</span>
+                <span>{formatEventDate(event.start_date, event.timezone ?? 'Europe/Stockholm')}</span>
               </div>
               <div className="flex items-center gap-3 text-zinc-700">
                 <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -145,7 +162,7 @@ export default async function EventPage({ params, searchParams }: Props) {
                   <Clock className="w-4 h-4" style={{ color: '#6DDEF7' }} />
                 </span>
                 <span>
-                  {format(new Date(event.start_date), 'HH:mm')} – {format(new Date(event.end_date), 'HH:mm')}
+                  {formatEventTime(event.start_date, event.timezone ?? 'Europe/Stockholm')} – {formatEventTime(event.end_date, event.timezone ?? 'Europe/Stockholm')} {getTimezoneAbbr(event.start_date, event.timezone ?? 'Europe/Stockholm')}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-zinc-700">

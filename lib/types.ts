@@ -12,6 +12,7 @@ export type Event = {
   published: boolean
   status: 'upcoming' | 'live' | 'past' | 'cancelled'
   cover_image: string | null
+  timezone: string
   created_at: string
   updated_at: string
 }
