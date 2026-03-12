@@ -1,12 +1,29 @@
 import { createClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 import { createEvent } from 'ics'
-import { format } from 'date-fns'
 
 interface SendInviteOptions {
   userId: string
   eventId: string
   origin: string
+}
+
+function formatEmailDate(iso: string, tz: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  }).format(new Date(iso))
+}
+
+function formatEmailTime(iso: string, tz: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(new Date(iso))
+}
+
+function getTimezoneAbbr(iso: string, tz: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: tz, timeZoneName: 'short',
+  }).formatToParts(new Date(iso)).find((p) => p.type === 'timeZoneName')?.value ?? tz
 }
 
 export async function sendInviteEmail({ userId, eventId, origin }: SendInviteOptions) {
@@ -43,19 +60,21 @@ export async function sendInviteEmail({ userId, eventId, origin }: SendInviteOpt
     description: event.description ?? '',
     location: event.location,
     start: [
-      startDate.getFullYear(),
-      startDate.getMonth() + 1,
-      startDate.getDate(),
-      startDate.getHours(),
-      startDate.getMinutes(),
+      startDate.getUTCFullYear(),
+      startDate.getUTCMonth() + 1,
+      startDate.getUTCDate(),
+      startDate.getUTCHours(),
+      startDate.getUTCMinutes(),
     ],
+    startInputType: 'utc',
     end: [
-      endDate.getFullYear(),
-      endDate.getMonth() + 1,
-      endDate.getDate(),
-      endDate.getHours(),
-      endDate.getMinutes(),
+      endDate.getUTCFullYear(),
+      endDate.getUTCMonth() + 1,
+      endDate.getUTCDate(),
+      endDate.getUTCHours(),
+      endDate.getUTCMinutes(),
     ],
+    endInputType: 'utc',
     url: `${baseUrl}/events/${event.slug}`,
     organizer: { name: 'Up Strategy Lab', email: 'events@events.upstrategylab.com' },
   })
@@ -102,8 +121,9 @@ function buildEmailHtml({
   gcalUrl: string
   baseUrl: string
 }) {
-  const startDate = new Date(event.start_date)
-  const endDate = new Date(event.end_date)
+  const tz = event.timezone ?? 'Europe/Stockholm'
+  const dateStr = formatEmailDate(event.start_date, tz)
+  const timeStr = `${formatEmailTime(event.start_date, tz)} – ${formatEmailTime(event.end_date, tz)} ${getTimezoneAbbr(event.start_date, tz)}`
 
   return `<!DOCTYPE html>
 <html>
@@ -123,11 +143,11 @@ function buildEmailHtml({
     <table style="width:100%;border-collapse:collapse">
       <tr>
         <td style="padding:5px 0;font-size:13px;color:#9ca3af;width:20px;vertical-align:top">📅</td>
-        <td style="padding:5px 0 5px 10px;font-size:14px;color:#111827">${format(startDate, 'EEEE, d MMMM yyyy')}</td>
+        <td style="padding:5px 0 5px 10px;font-size:14px;color:#111827">${dateStr}</td>
       </tr>
       <tr>
         <td style="padding:5px 0;font-size:13px;color:#9ca3af;vertical-align:top">🕐</td>
-        <td style="padding:5px 0 5px 10px;font-size:14px;color:#111827">${format(startDate, 'HH:mm')} – ${format(endDate, 'HH:mm')}</td>
+        <td style="padding:5px 0 5px 10px;font-size:14px;color:#111827">${timeStr}</td>
       </tr>
       <tr>
         <td style="padding:5px 0;font-size:13px;color:#9ca3af;vertical-align:top">📍</td>
