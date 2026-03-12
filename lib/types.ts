@@ -30,7 +30,7 @@ export type Speaker = {
 export type RSVP = {
   id: string
   event_id: string
-  user_id: string
+  user_id: string | null
   email: string
   name: string | null
   status: 'confirmed' | 'waitlist' | 'cancelled'

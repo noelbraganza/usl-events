@@ -5,6 +5,8 @@ import { MapPin, Calendar, Clock, Users } from 'lucide-react'
 import type { Speaker } from '@/lib/types'
 import RSVPForm from './RSVPForm'
 import EventPageClient from './EventPageClient'
+import AttendeesList from './AttendeesList'
+import BrandAnimals from '@/app/components/admin/BrandAnimals'
 
 interface Props {
   params: { slug: string }
@@ -41,13 +43,6 @@ export default async function EventPage({ params, searchParams }: Props) {
   return (
     <main className="min-h-screen bg-white">
       {/* RSVP status banners */}
-      {searchParams.rsvp === 'confirmed' && (
-        <div className="bg-green-50 border-b border-green-200 px-6 py-4 text-center">
-          <p className="text-green-800 font-medium">
-            You&apos;re in! Check your email — we&apos;ve sent a calendar invite.
-          </p>
-        </div>
-      )}
       {searchParams.rsvp === 'waitlist' && (
         <div className="bg-amber-50 border-b border-amber-200 px-6 py-4 text-center">
           <p className="text-amber-800 font-medium">
@@ -61,7 +56,7 @@ export default async function EventPage({ params, searchParams }: Props) {
         <div className="absolute bottom-0 left-0 right-0 h-[2px]"
           style={{ background: 'linear-gradient(to right, #905AC0, #D03B6E, #6DDEF7)' }} />
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <span className="text-sm font-semibold text-zinc-700">Up Strategy Lab</span>
+          <BrandAnimals />
           <a
             href="https://upstrategylab.com"
             target="_blank"
@@ -252,13 +247,14 @@ export default async function EventPage({ params, searchParams }: Props) {
             )}
           </div>
 
-          {/* Right: RSVP form (sticky) */}
+          {/* Right: RSVP form (sticky) + attendees */}
           <div className="lg:sticky lg:top-8 lg:self-start">
             <RSVPForm
               eventId={event.id}
               eventSlug={event.slug}
               isFull={isFull}
             />
+            <AttendeesList eventId={event.id} />
           </div>
         </div>
       </div>

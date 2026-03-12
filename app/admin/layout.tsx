@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import BrandAnimals from '@/app/components/admin/BrandAnimals'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
@@ -15,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <nav className="bg-white border-b border-zinc-200 px-6 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <span className="font-semibold text-zinc-900 text-sm">USL Events</span>
+            <BrandAnimals />
             <div className="flex items-center gap-1">
               <Link
                 href="/admin/dashboard"

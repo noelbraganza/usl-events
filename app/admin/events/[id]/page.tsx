@@ -47,7 +47,7 @@ export default async function EditEventPage({ params }: Props) {
       <EventForm event={event} />
 
       <div className="mt-16 pt-10 border-t border-zinc-200">
-        <RSVPList rsvps={rsvps ?? []} eventTitle={event.title} />
+        <RSVPList rsvps={rsvps ?? []} eventTitle={event.title} eventId={event.id} />
       </div>
     </div>
   )
